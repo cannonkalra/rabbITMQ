@@ -42,10 +42,10 @@ __Example__
 
 The Repository is a Work In Progress (WIP) and provides the __rabbITMQ__ Stack with different levels of security
 
-| Stack Name          | Security               |
-|:-------------------:|------------------------|
-| `prototype`         | basic level passwords  |
-| `selfsigned`        | with Self-Signed Certs |
+| Stack Name          | Security               | Status      |
+|:-------------------:|------------------------|-------------|
+| `prototype`         | basic level passwords  | DONE        |
+| `selfsigned`        | with Self-Signed Certs | PLANNED     |
 
 __NOTE__: Each directory has its own `README.md` and SHOULD be referred to for initial configuration / customization
 
