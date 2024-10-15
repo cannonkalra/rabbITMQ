@@ -1,0 +1,48 @@
+services:
+  rabbitmq:
+    image: rabbitmq:4.0-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_NODENAME=rabbITMQ
+    ports:
+      - 1883:1883 # MQTT Port
+      - 5672:5672 # AMQP Port
+      - 15672:15672 # Management UI HTTP
+    volumes:
+      - ./config/rabbitmq/plugins/enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - ./config/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    tmpfs:
+      - /var/lib/rabbitmq
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=rabbITMQ
+      - DOCKER_INFLUXDB_INIT_ORG=IoT-Yoda
+      - DOCKER_INFLUXDB_INIT_BUCKET=rabbitBucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=verysecretivetoken
+    ports:
+      - 8086:8086
+    tmpfs:
+      - /var/lib/influxdb2
+
+  telegraf:
+    image: telegraf:1.32
+    container_name: telegraf
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=rabbITMQ
+      - DOCKER_INFLUXDB_INIT_ORG=IoT-Yoda
+      - DOCKER_INFLUXDB_INIT_BUCKET=rabbitBucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=verysecretivetoken
+      - TELEGRAF_AMQP_BROKER_USERNAME=admin
+      - TELEGRAF_AMQP_BROKER_PASSWORD=rabbITMQ
+    depends_on:
+      - rabbitmq
+      - influxdb
+    volumes:
+      - ./config/telegraf/telegraf.toml:/etc/telegraf/telegraf.conf:ro

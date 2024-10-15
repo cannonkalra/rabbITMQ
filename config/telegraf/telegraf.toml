@@ -57,12 +57,12 @@
   ## ADAPT CONFIGURATION BELOW ACCORDINGLY
 
   binding_key = "IOT.#"
-  
+
   ## Data format to consume.
-  data_format = "influx"
+  # data_format = "influx"
 
   ## If Payload is JSON use
-  # data_format = "json"
+  data_format = "json"
 
   ## Refer to Telegraf documentation on how to Parse incoming JSON
 
