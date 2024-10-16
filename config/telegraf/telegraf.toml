@@ -52,7 +52,7 @@
 
   ## A binding between the exchange and queue using this binding key is
   ## created.  If unset, no binding is created.
-
+  # name_override = "iot"
 
   ## ADAPT CONFIGURATION BELOW ACCORDINGLY
 
@@ -62,10 +62,22 @@
   # data_format = "influx"
 
   ## If Payload is JSON use
-  data_format = "json"
+  data_format = "json_v2"
+  [[inputs.amqp_consumer.json_v2]]
+    measurement_name_path = "measurement"
+    timestamp_path = "timestamp"
+    timestamp_format = "unix_ms"
+      [[inputs.amqp_consumer.json_v2.tag]]
+        path = "tags.room"  # Specify the tag path
+        type = "string"
+    [[inputs.amqp_consumer.json_v2.object]]
+      timestamp_key = "timestamp"
+      timestamp_format = "unix_ms"
+      path = "fields"  # Points to the dynamic fields object
+      included_keys = []  # Empty to allow all keys inside 'fields'
+      # type = "float"  # Assuming all fields are float, adjust if necessary
 
   ## Refer to Telegraf documentation on how to Parse incoming JSON
-
 
 ## NOTE: add additional [[inputs.amqp_consumer]] table if
 ## you have additional services that produce AMQP messages
@@ -94,10 +106,10 @@
   # bucket_tag = ""
 
   ## If true, the bucket tag will not be added to the metric.
-  # exclude_bucket_tag = false
+  exclude_bucket_tag = false
 
   ## Timeout for HTTP messages.
   # timeout = "5s"
-  
+
   ## HTTP User-Agent
   user_agent = "telegraf"

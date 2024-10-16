@@ -1,0 +1,12 @@
+{
+  "measurement": "home",
+  "tags": {
+    "room": "Living Room"
+  },
+  "fields": {
+    "temp": 21.1,
+    "hum": 35.9,
+    "co": 0
+  },
+  "timestamp": 1729058487711
+}

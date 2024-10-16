@@ -1,0 +1,30 @@
+# Example taken from: https://github.com/influxdata/telegraf/issues/5940
+
+[[inputs.file]]
+  files = ["./input.json"]
+  data_format = "json_v2"
+  [[inputs.file.json_v2]]
+    measurement_name_path = "measurement"
+    timestamp_path = "timestamp"
+    timestamp_format = "unix_ms"
+      [[inputs.file.json_v2.tag]]
+        path = "tags.room"  # Specify the tag path
+        type = "string"
+      # [[inputs.file.json_v2.field]]
+      #   path = "fields.temp"
+      #   type = "float"  # Specify the field type
+      # [[inputs.file.json_v2.field]]
+      #   path = "fields.hum"
+      #   type = "float"
+      # [[inputs.file.json_v2.field]]
+      #   path = "fields.co"
+      #   type = "int"
+      # [[inputs.file.json_v2.field]]
+      #   path = "fields.*"
+      #   type = "float"
+    [[inputs.file.json_v2.object]]
+      timestamp_key = "timestamp"
+      timestamp_format = "unix_ms"
+      path = "fields"  # Points to the dynamic fields object
+      included_keys = []  # Empty to allow all keys inside 'fields'
+      # type = "float"  # Assuming all fields are float, adjust if necessary
