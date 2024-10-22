@@ -6,7 +6,7 @@ import logging
 import random
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger()
 
 
@@ -30,7 +30,8 @@ class MQTTClient:
         self.client.connect(self.host, self.port, keepalive)
 
     def publish(self, message):
-        self.client.publish(self.topic, message)
+        if self.client.is_connected():
+            self.client.publish(self.topic, message)
 
     @staticmethod
     def on_publish(client, userdata, mid, reason_code, properties):
@@ -39,18 +40,18 @@ class MQTTClient:
     @staticmethod
     def on_connect(client, userdata, flags, reason_code, properties):
         if reason_code == 0:
-            log.debug("MQTT Connected...")
+            log.info("MQTT Connected...")
 
     @staticmethod
     def on_disconnect(client, userdata, flags, reason_code, properties):
         if reason_code == 0:
-            log.debug("Requested disconnect executed successfully")
+            log.info("Requested disconnect executed successfully")
         else:
-            log.debug(f"Unexpected disconnect from MQTT, reason code: {reason_code}")
+            log.error(f"Unexpected disconnect from MQTT, reason code: {reason_code}")
 
     @staticmethod
     def on_message(client, userdata, msg):
-        log.debug(f"{msg.topic}: {msg.payload.decode()}")
+        log.info(f"{msg.topic}: {msg.payload.decode()}")
 
 
 class DataGenerator:
@@ -63,7 +64,7 @@ class DataGenerator:
             "fields": {
                 "temp": random.randint(0, 9000) / 100,
                 "hum": random.randint(100, 900) / 10,
-                "co": random.randint(0, 200) / 10,
+                "co": random.randint(10, 200) / 10,
             },
             "timestamp": milliseconds,
         }
@@ -71,14 +72,14 @@ class DataGenerator:
 
 
 class Publisher:
-    def __init__(self, mqtt_client):
+    def __init__(self, mqtt_client: MQTTClient):
         self.mqtt_client = mqtt_client
 
-    def publish_data(self, N=100):
+    def publish_data(self, N=1_000_000):
         for _ in range(N):
             message = DataGenerator.make_fake_data()
             self.mqtt_client.publish(message)
-            sleep_ms = random.randint(100, 2000) / 1000
+            sleep_ms = random.randint(10, 100) / 1000
             time.sleep(sleep_ms)
 
 
@@ -102,8 +103,8 @@ if __name__ == "__main__":
     publisher = Publisher(mqtt_client)
 
     try:
-        publisher.publish_data(N=100)
-        mqtt_client.client.loop_forever()
+        mqtt_client.client.loop_start()
+        publisher.publish_data()
 
     except KeyboardInterrupt:
         mqtt_client.client.disconnect()
